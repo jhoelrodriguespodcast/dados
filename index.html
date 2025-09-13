@@ -1,94 +1,40 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Agendamento Online</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-      background-color: #f5f5f5;
-      text-align: center;
-    }
-    form {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      display: inline-block;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    input, button {
-      padding: 10px;
-      margin: 8px 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    #mensagem {
-      margin-top: 15px;
-      font-weight: bold;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Ler TXT do Google Drive</title>
 </head>
 <body>
-  <h2>Agende seu horário</h2>
-  <form id="form-agendamento">
-    <input type="text" name="nome" placeholder="Seu nome" required><br>
-    <input type="text" name="telefone" placeholder="Telefone" required><br>
-    <input type="text" name="servico" placeholder="Serviço" required><br>
-    <input type="date" name="data" required><br>
-    <input type="time" name="hora" required><br>
-    <button type="submit">Agendar</button>
-  </form>
+    <h1>Selecione um arquivo TXT</h1>
 
-  <p id="mensagem"></p>
+    <select id="arquivoSelect">
+        <option value="">--Selecione--</option>
+        <option value="https://drive.google.com/uc?export=download&id=ABC123XYZ">Arquivo 1</option>
+        <option value="https://drive.google.com/uc?export=download&id=DEF456UVW">Arquivo 2</option>
+    </select>
 
-  <script>
-    const form = document.getElementById("form-agendamento");
+    <h2>Conteúdo do arquivo:</h2>
+    <pre id="conteudo"></pre>
 
-    // Coloque aqui a URL do seu Web App publicado no Apps Script
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw4_aTmCrJK6GZxirxy7xRI5_F_KgLIJHmtbISofLtaXAVCcdiA4ZfN_4FZX6u06bC7/exec";
+    <script>
+        const select = document.getElementById('arquivoSelect');
+        const conteudo = document.getElementById('conteudo');
 
-    form.addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const dados = {
-        nome: form.nome.value,
-        telefone: form.telefone.value,
-        servico: form.servico.value,
-        data: form.data.value,
-        hora: form.hora.value
-      };
-
-      fetch(WEB_APP_URL, {
-        method: "POST",
-        body: JSON.stringify(dados),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(response => response.json())
-      .then(res => {
-        if(res.status === "sucesso") {
-          document.getElementById("mensagem").innerText = "✅ Agendamento realizado com sucesso!";
-          form.reset();
-        } else {
-          document.getElementById("mensagem").innerText = "❌ Erro: " + res.mensagem;
-        }
-      })
-      .catch(err => {
-        document.getElementById("mensagem").innerText = "❌ Erro ao agendar. Tente novamente.";
-        console.error(err);
-      });
-    });
-  </script>
+        select.addEventListener('change', () => {
+            const url = select.value;
+            if(url){
+                fetch(url)
+                .then(response => response.text())
+                .then(text => {
+                    conteudo.textContent = text;
+                })
+                .catch(err => {
+                    conteudo.textContent = 'Erro ao carregar arquivo: ' + err;
+                });
+            } else {
+                conteudo.textContent = '';
+            }
+        });
+    </script>
 </body>
 </html>
